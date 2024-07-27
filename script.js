@@ -1,5 +1,12 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Smooth scrolling for header links
+    document.documentElement.style.scrollBehavior = 'auto';
+
+    window.scrollTo(0, 0);
+
+    setTimeout(function() {
+        document.documentElement.style.scrollBehavior = 'smooth';
+    }, 100);
+
     const headerLinks = document.querySelectorAll('#header a');
     
     headerLinks.forEach(link => {
@@ -110,6 +117,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setAlarmBtn.addEventListener("click", setAlarm);
 
     // Stopwatch functionality
+
     let stopwatchSeconds = 00;
     let stopwatchTens = 00;
     let stopwatchMins = 00;
@@ -169,6 +177,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Timer functionality
+
     const hoursSelect = document.getElementById('hours');
     const minutesSelect = document.getElementById('minutes');
     const secondsSelect = document.getElementById('seconds');
@@ -178,7 +187,6 @@ document.addEventListener('DOMContentLoaded', function() {
     let timerInterval;
     let totalSeconds = 0;
 
-    // Populate select options
     for (let i = 0; i <= 24; i++) {
         hoursSelect.options.add(new Option(i.toString().padStart(2, '0'), i));
     }
@@ -236,6 +244,5 @@ document.addEventListener('DOMContentLoaded', function() {
     startButton.addEventListener('click', startTimer);
     resetButton.addEventListener('click', resetTimer);
 
-    // Initial display update
     updateDisplay();
 });
