@@ -7,6 +7,28 @@ document.addEventListener('DOMContentLoaded', function() {
         document.documentElement.style.scrollBehavior = 'smooth';
     }, 100);
 
+    // Scrollbar gradient reversal
+    let lastScrollTop = 0;
+    let isScrollingDown = true;
+
+    window.addEventListener('scroll', function() {
+        let st = window.pageYOffset || document.documentElement.scrollTop;
+        if (st > lastScrollTop) {
+            // Scrolling down
+            if (!isScrollingDown) {
+                document.styleSheets[0].addRule('::-webkit-scrollbar-thumb', 'background: linear-gradient(to bottom, black, grey);');
+                isScrollingDown = true;
+            }
+        } else {
+            // Scrolling up
+            if (isScrollingDown) {
+                document.styleSheets[0].addRule('::-webkit-scrollbar-thumb', 'background: linear-gradient(to top, black, grey);');
+                isScrollingDown = false;
+            }
+        }
+        lastScrollTop = st <= 0 ? 0 : st; // For Mobile or negative scrolling
+    }, false);
+
     // Alarm functionality
     const modal = document.getElementById("popupModal");
     const btn = document.getElementById("addAlarmButton");
