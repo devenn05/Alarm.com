@@ -7,22 +7,6 @@ document.addEventListener('DOMContentLoaded', function() {
         document.documentElement.style.scrollBehavior = 'smooth';
     }, 100);
 
-    const headerLinks = document.querySelectorAll('#header a');
-    
-    headerLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            const targetId = this.getAttribute('href').substring(1);
-            const targetElement = document.getElementById(targetId);
-            
-            if (targetElement) {
-                targetElement.scrollIntoView({
-                    behavior: 'smooth'
-                });
-            }
-        });
-    });
-
     // Alarm functionality
     const modal = document.getElementById("popupModal");
     const btn = document.getElementById("addAlarmButton");
@@ -31,22 +15,31 @@ document.addEventListener('DOMContentLoaded', function() {
     const content = document.querySelector(".clock-content");
     const selectMenu = document.querySelectorAll("select");
     const setAlarmBtn = document.querySelector(".wrapper button");
+    const alarmStatusDiv = document.getElementById('alarmStatus');
+    const stopAlarmBtn = document.getElementById('stopAlarmButton');
 
     let alarmTime, isAlarmSet = false;
     const ringtone = new Audio("./files/ringtone.mp3");
+    ringtone.preload = 'auto';
 
     btn.onclick = function() {
         modal.style.display = "block";
+        updateSetAlarmButtonText();
     }
 
     span.onclick = function() {
-        modal.style.display = "none";
+        closeModal();
     }
 
     window.onclick = function(event) {
         if (event.target == modal) {
-            modal.style.display = "none";
+            closeModal();
         }
+    }
+
+    function closeModal() {
+        modal.style.display = "none";
+        selectMenu.forEach(select => select.selectedIndex = 0);
     }
 
     for (let i = 12; i > 0; i--) {
@@ -86,38 +79,72 @@ document.addEventListener('DOMContentLoaded', function() {
     
         currentTime.innerText = `${h}:${m}:${s} ${ampm}`;
     
-        if (alarmTime == `${h}:${m} ${ampm}`) {
+        // Check for alarm 100ms before the second changes
+        if (s === '59') {
+            setTimeout(() => {
+                if (alarmTime == `${h}:${m} ${ampm}`) {
+                    ringtone.play();
+                    ringtone.loop = true;
+                    stopAlarmBtn.style.display = 'block';
+                }
+            }, 900);
+        } else if (alarmTime == `${h}:${m} ${ampm}` && s === '00') {
             ringtone.play();
             ringtone.loop = true;
+            stopAlarmBtn.style.display = 'block';
         }
     }, 1000);
-    
-
 
     function setAlarm() {
         if (isAlarmSet) {
             alarmTime = "";
             ringtone.pause();
+            ringtone.currentTime = 0;
             content.classList.remove("disable");
-            setAlarmBtn.innerText = "Set Alarm";
-            return isAlarmSet = false;
-        }
+            isAlarmSet = false;
+            updateSetAlarmButtonText();
+            updateAlarmStatus();
+            stopAlarmBtn.style.display = 'none';
+        } else {
+            let time = `${selectMenu[0].value}:${selectMenu[1].value} ${selectMenu[2].value}`;
+            if (time.includes("Hour") || time.includes("Minute") || time.includes("AM/PM")) {
+                return alert("Please, select a valid time to set Alarm!");
+            }
 
-        let time = `${selectMenu[0].value}:${selectMenu[1].value} ${selectMenu[2].value}`;
-        if (time.includes("Hour") || time.includes("Minute") || time.includes("AM/PM")) {
-            return alert("Please, select a valid time to set Alarm!");
+            alarmTime = time;
+            isAlarmSet = true;
+            content.classList.add("disable");
+            updateSetAlarmButtonText();
+            updateAlarmStatus();
         }
+        closeModal();
+    }
 
-        alarmTime = time;
-        isAlarmSet = true;
-        content.classList.add("disable");
-        setAlarmBtn.innerText = "Clear Alarm";
+    function updateSetAlarmButtonText() {
+        setAlarmBtn.innerText = isAlarmSet ? "Clear Alarm" : "Set Alarm";
+    }
+
+    function updateAlarmStatus() {
+        if (isAlarmSet) {
+            alarmStatusDiv.textContent = "Alarm set for " + alarmTime;
+        } else {
+            alarmStatusDiv.textContent = "";
+        }
     }
 
     setAlarmBtn.addEventListener("click", setAlarm);
 
-    // Stopwatch functionality
+    stopAlarmBtn.addEventListener("click", function() {
+        ringtone.pause();
+        ringtone.currentTime = 0;
+        stopAlarmBtn.style.display = 'none';
+        isAlarmSet = false;
+        alarmTime = "";
+        updateSetAlarmButtonText();
+        updateAlarmStatus();
+    });
 
+    // Stopwatch functionality
     let stopwatchSeconds = 00;
     let stopwatchTens = 00;
     let stopwatchMins = 00;
@@ -177,7 +204,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Timer functionality
-
     const hoursSelect = document.getElementById('hours');
     const minutesSelect = document.getElementById('minutes');
     const secondsSelect = document.getElementById('seconds');
@@ -217,10 +243,17 @@ document.addEventListener('DOMContentLoaded', function() {
                     const minutes = Math.floor((totalSeconds % 3600) / 60);
                     const seconds = totalSeconds % 60;
                     timerDisplay.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                    
+                    // Check if timer is about to end
+                    if (totalSeconds === 1) {
+                        setTimeout(() => {
+                            ringtone.play();
+                            ringtone.loop = true;
+                        }, 900);
+                    }
                 } else {
                     clearInterval(timerInterval);
-                    ringtone.play();
-                    ringtone.loop = true;
+                    updateDisplay();
                 }
             }, 1000);
         }
@@ -244,5 +277,25 @@ document.addEventListener('DOMContentLoaded', function() {
     startButton.addEventListener('click', startTimer);
     resetButton.addEventListener('click', resetTimer);
 
+    ringtone.load();
+
     updateDisplay();
+
+    // Event listeners for header links
+    const headerLinks = document.querySelectorAll('#header a');
+    
+    headerLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href').substring(1);
+            const targetElement = document.getElementById(targetId);
+            
+            if (targetElement) {
+                targetElement.scrollIntoView({
+                    behavior: 'smooth'
+                });
+                closeModal(); // Close the modal when switching sections
+            }
+        });
+    });
 });
