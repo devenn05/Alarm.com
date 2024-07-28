@@ -79,7 +79,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
         currentTime.innerText = `${h}:${m}:${s} ${ampm}`;
     
-        // Check for alarm 100ms before the second changes
         if (s === '59') {
             setTimeout(() => {
                 if (alarmTime == `${h}:${m} ${ampm}`) {
@@ -145,63 +144,62 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Stopwatch functionality
-    let stopwatchSeconds = 00;
-    let stopwatchTens = 00;
-    let stopwatchMins = 00;
+    let stopwatchSeconds = 0;
+    let stopwatchTens = 0;
+    let stopwatchMins = 0;
     let getStopwatchSeconds = document.querySelector('.stopwatch-seconds');
     let getStopwatchTens = document.querySelector('.stopwatch-tens');
     let getStopwatchMins = document.querySelector('.stopwatch-mins');
     let btnStopwatchStart = document.querySelector('.stopwatch-btn-start');
     let btnStopwatchStop = document.querySelector('.stopwatch-btn-stop');
     let btnStopwatchReset = document.querySelector('.stopwatch-btn-reset');
-    let stopwatchInterval;
+    let stopwatchRunning = false;
+    let stopwatchStartTime;
+    let stopwatchElapsedTime = 0;
 
-    btnStopwatchStart.addEventListener('click', () => {
-        clearInterval(stopwatchInterval);
-        stopwatchInterval = setInterval(startStopwatch, 10);
-    })
+    function updateStopwatch() {
+        if (stopwatchRunning) {
+            const currentTime = performance.now();
+            const deltaTime = currentTime - stopwatchStartTime;
+            const totalMilliseconds = stopwatchElapsedTime + deltaTime;
 
-    btnStopwatchStop.addEventListener('click', () => {
-        clearInterval(stopwatchInterval);
-    })
+            stopwatchTens = Math.floor((totalMilliseconds % 1000) / 10);
+            stopwatchSeconds = Math.floor((totalMilliseconds / 1000) % 60);
+            stopwatchMins = Math.floor((totalMilliseconds / 1000 / 60) % 60);
 
-    btnStopwatchReset.addEventListener('click', () => {
-        clearInterval(stopwatchInterval);
-        stopwatchTens = '00';
-        stopwatchSeconds = '00';
-        stopwatchMins = '00';
-        getStopwatchSeconds.innerHTML = stopwatchSeconds;
-        getStopwatchTens.innerHTML = stopwatchTens;
-        getStopwatchMins.innerHTML = stopwatchMins;
-    })
+            getStopwatchTens.innerHTML = stopwatchTens.toString().padStart(2, '0');
+            getStopwatchSeconds.innerHTML = stopwatchSeconds.toString().padStart(2, '0');
+            getStopwatchMins.innerHTML = stopwatchMins.toString().padStart(2, '0');
 
-    function startStopwatch() {
-        stopwatchTens++;
-        if (stopwatchTens <= 9) {
-            getStopwatchTens.innerHTML = '0' + stopwatchTens;
-        }
-        if (stopwatchTens > 9) {
-            getStopwatchTens.innerHTML = stopwatchTens;
-        }
-        if (stopwatchTens > 99) {
-            stopwatchSeconds++;
-            getStopwatchSeconds.innerHTML = '0' + stopwatchSeconds;
-            stopwatchTens = 0;
-            getStopwatchTens.innerHTML = '0' + 0;
-        }
-        if (stopwatchSeconds > 9) {
-            getStopwatchSeconds.innerHTML = stopwatchSeconds;
-        }
-        if (stopwatchSeconds > 59) {
-            stopwatchMins++;
-            getStopwatchMins.innerHTML = '0' + stopwatchMins;
-            stopwatchSeconds = 0;
-            getStopwatchSeconds.innerHTML = '0' + 0;
-        }
-        if (stopwatchMins > 9) {
-            getStopwatchMins.innerHTML = stopwatchMins;
+            requestAnimationFrame(updateStopwatch);
         }
     }
+
+    btnStopwatchStart.addEventListener('click', () => {
+        if (!stopwatchRunning) {
+            stopwatchRunning = true;
+            stopwatchStartTime = performance.now();
+            requestAnimationFrame(updateStopwatch);
+        }
+    });
+
+    btnStopwatchStop.addEventListener('click', () => {
+        if (stopwatchRunning) {
+            stopwatchRunning = false;
+            stopwatchElapsedTime += performance.now() - stopwatchStartTime;
+        }
+    });
+
+    btnStopwatchReset.addEventListener('click', () => {
+        stopwatchRunning = false;
+        stopwatchElapsedTime = 0;
+        stopwatchTens = 0;
+        stopwatchSeconds = 0;
+        stopwatchMins = 0;
+        getStopwatchTens.innerHTML = '00';
+        getStopwatchSeconds.innerHTML = '00';
+        getStopwatchMins.innerHTML = '00';
+    });
 
     // Timer functionality
     const hoursSelect = document.getElementById('hours');
@@ -244,7 +242,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     const seconds = totalSeconds % 60;
                     timerDisplay.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
                     
-                    // Check if timer is about to end
                     if (totalSeconds === 1) {
                         setTimeout(() => {
                             ringtone.play();
@@ -294,7 +291,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 targetElement.scrollIntoView({
                     behavior: 'smooth'
                 });
-                closeModal(); // Close the modal when switching sections
+                closeModal();
             }
         });
     });
