@@ -42,15 +42,18 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: calc(86vh - 60px);
+    height: calc(105vh - 60px);
+    flex-direction: column;
 }
 
 .circle-button-wrapper {
     position: relative;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
+    justify-content: center;
 }
+
 
 .outer-circle {
     position: absolute;
@@ -74,11 +77,53 @@ body {
     font-size: 20px;
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.3s ease;
+    z-index: 1;
 }
 
 .circle-button:hover {
     background-color: darkgrey;
     transform: scale(1.1);
+}
+.alarm-status {
+    font-family: "Zain", sans-serif;
+    font-weight: 500;
+    font-style: normal;
+    font-size: 16px;
+    color: white;
+    margin-top: 20px;
+    text-align: center;
+}
+
+.stop-alarm-button {
+    width: 100px;
+    height: 40px;
+    border-radius: 20px;
+    background-color: white;
+    color: black;
+    border: 2px solid white;
+    font-family: "Bona Nova SC", serif;
+    font-size: 14px;
+    cursor: pointer;
+    margin-top: 20px;
+    display: none;
+    transition: background-color 0.3s ease;
+}
+
+.stop-alarm-button::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border: 2px solid white;
+    border-radius: 50%;
+    pointer-events: none;
+}
+.stop-alarm-button:hover{
+    background-color: grey;
+    width: 110px;
+    height: 45px;
 }
 
 /* Popup Modal */
@@ -235,16 +280,16 @@ body {
 .stopwatch {
     background-color: black;
     width: 100%;
-    min-height: calc(100vh - 160px); /* Subtract header height (60px) and alarm-base height (100px) */
+    min-height: calc(90vh - 160px); /* Subtract header height (60px) and alarm-base height (100px) */
     display: flex;
     justify-content: center;
     align-items: center;
-    padding-bottom: 100px; /* Add padding to account for the fixed alarm-base */
+    padding-bottom: 150px; /* Add padding to account for the fixed alarm-base */
 }
 
 .stopwatch-container {
     text-align: center;
-    padding-top: 370px;
+    padding-top: 300px;
 }
 
 .stopwatch-wrapper {
