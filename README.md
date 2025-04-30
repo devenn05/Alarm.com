@@ -1,4 +1,4 @@
-# MyAlarm - Time Management Web App
+# MyAlarm - Time Management WebPage
 
 A sleek, all-in-one time management web application featuring an alarm clock, stopwatch, and countdown timer - built to solve my own needs while preparing for MCA-CET exams.
 
