@@ -29,7 +29,6 @@ While preparing for my MCA-CET entrance exam:
 - I needed a simple stopwatch to time my quant problem-solving
 - Existing web tools were cluttered or distracting
 - Wanted an all-in-one solution for time management
-- Needed something that worked offline during study sessions
 
 This project combines utility with elegant design to create the perfect study companion.
 
@@ -41,11 +40,5 @@ This project combines utility with elegant design to create the perfect study co
   - Direction-aware scrollbar gradients
   - Smooth scrolling navigation
   - Modal dialogs for alarm setting
-- **Audio Integration**: Custom alarm ringtone
 - **Performance**: Uses `requestAnimationFrame` for accurate timing
 
-## How to Use
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/your-username/MyAlarm.git
